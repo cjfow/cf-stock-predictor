@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--Background Colors-->
+    <Color x:Key="primaryBackColor1">#181C23</Color>
+    <Color x:Key="primaryBackColor2">#2C3445</Color>
+
+    <!--Window Border Colors-->
+    <Color x:Key="winBorderColor1">#A6AFC2</Color>
+    <Color x:Key="winBorderColor2">#616B81</Color>
+    <Color x:Key="winBorderColor3">#1E2E4F</Color>
+
+    <!--Font/Title Colors-->
+    <SolidColorBrush x:Key="titleColor1" Color="#697FA9"/>
+    <SolidColorBrush x:Key="titleColor2" Color="#D5CFF5"/>
+    <SolidColorBrush x:Key="titleColor3" Color="#BCBEE0"/>
+    <SolidColorBrush x:Key="plainTextColor1" Color="#DFEAFF"/>
+    <SolidColorBrush x:Key="plainTextColor2" Color="#E0EAFF"/>
+    <!--Panel Colors-->
+    <SolidColorBrush x:Key="closeButton" Color="#72232C"/>
+    <SolidColorBrush x:Key="closeButtonHover" Color="#332123"/>
+    <SolidColorBrush x:Key="comboBoxColor" Color="#1E2E4F"/>
+    <SolidColorBrush x:Key="panelColor" Color="#4277E9"/>
+    <SolidColorBrush x:Key="panelOverColor" Color="#4277E9"/>
+
+</ResourceDictionary>
