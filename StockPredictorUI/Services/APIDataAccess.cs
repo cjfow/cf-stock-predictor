@@ -62,7 +62,6 @@ public class APIDataAccess : IDataAccess
     private static async Task FetchDataForPeriodAsync(string url, List<StockModel> stockData)
     {
         var response = await client.GetAsync(url);
-
         string responseContent = await response.Content.ReadAsStringAsync();
 
         Console.WriteLine($"API Response: {responseContent}");
