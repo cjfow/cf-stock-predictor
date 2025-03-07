@@ -1,31 +1,31 @@
 ﻿using StockPredictorUI.ViewModels;
+using StockPredictorUI.Models;
 using System.Windows;
 using System.Windows.Input;
 
-
-namespace StockPredictorUI.Views;
-
-/// <summary>
-/// Interaction logic for ChartView.xaml
-/// </summary>
-public partial class ChartView : Window
+namespace StockPredictorUI.Views
 {
-    public ChartView()
+    /// <summary>
+    /// Interaction logic for ChartView.xaml
+    /// </summary>
+    public partial class ChartView : Window
     {
-        InitializeComponent();
-        DataContext = new ChartViewModel();
-    }
+        private readonly ChartViewModel _chartViewModel;
 
-    private void OnClose_Click(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
-
-    private void Window_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
+        // Constructor that accepts stock data
+        public ChartView(string stockTicker, List<float> predictionData, int predictionHorizon)
         {
-            DragMove();
+            InitializeComponent();
+            _chartViewModel = new ChartViewModel(stockTicker, predictionData, predictionHorizon); // Pass the stock data to the ViewModel
+            DataContext = _chartViewModel; // Set the DataContext to the ViewModel
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
         }
     }
 }

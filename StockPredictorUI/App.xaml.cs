@@ -1,6 +1,7 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using StockPredictorUI.Services;
+using System.Threading.Tasks;
 using System.Windows;
+using System;
 
 namespace StockPredictorUI;
 

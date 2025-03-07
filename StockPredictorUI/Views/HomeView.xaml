@@ -179,7 +179,7 @@
                                TextAlignment="Center"
                                Margin="0,5,0,0"/>
 
-                    <TextBlock Text="Enter Index Fund Ticker"
+                    <TextBlock Text="Enter Fund Ticker"
                                FontSize="13"
                                FontFamily="Montserrat"
                                FontWeight="Medium"
@@ -188,6 +188,7 @@
                                Margin="140,40,150,0"/>
 
                     <TextBox x:Name="TickerTextBox"
+                             Text="{Binding StockTicker, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                              FontSize="14"
                              FontWeight="Medium"
                              FontFamily="Montserrat"
@@ -219,7 +220,6 @@
                     <Slider x:Name="PredictionHorizonSlider"
                             Minimum="1"
                             Maximum="5"
-                            Value="1"
                             SmallChange="1" 
                             LargeChange="1"
                             TickFrequency="1" 
@@ -229,7 +229,8 @@
                             Height="28"
                             Margin="0,5,0,0"
                             TickPlacement="BottomRight"
-                            HorizontalAlignment="Center"/>
+                            HorizontalAlignment="Center"
+                            Value="{Binding PredictionHorizon, Mode=TwoWay}"/>
 
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
@@ -327,7 +328,6 @@
                             VerticalAlignment="Center"
                             Margin="0,35,0,0"
                             Command="{Binding OpenTickerListCommand}"/>
-
                 </StackPanel>
             </Grid>
         </Border>

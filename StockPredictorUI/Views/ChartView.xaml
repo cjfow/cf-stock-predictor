@@ -12,10 +12,12 @@
         Background="Transparent"
         WindowStyle="None"
         AllowsTransparency="True"
-        Title="ChartView" Height="800" Width="1400"
+        Title="ChartView"
+        Height="800" Width="1400"
         MouseDown="Window_MouseDown">
 
-    <Border x:Name="BackgroundImageBorder" CornerRadius="12">
+    <Border x:Name="BackgroundImageBorder"
+            CornerRadius="12">
         <Border.Effect>
             <DropShadowEffect/>
         </Border.Effect>
@@ -27,28 +29,30 @@
 
             <Border.BorderBrush>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="{StaticResource winBorderColor1}" Offset="1"/>
-                    <GradientStop Color="{StaticResource winBorderColor2}" Offset="0.7"/>
-                    <GradientStop Color="{StaticResource winBorderColor3}" Offset="0"/>
+                    <GradientStop Color="{StaticResource winBorderColor1}"
+                                  Offset="1"/>
+                    <GradientStop Color="{StaticResource winBorderColor2}"
+                                  Offset="0.7"/>
+                    <GradientStop Color="{StaticResource winBorderColor3}"
+                                  Offset="0"/>
                 </LinearGradientBrush>
             </Border.BorderBrush>
 
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="{StaticResource primaryBackColor1}" Offset="0.1"/>
-                    <GradientStop Color="{StaticResource primaryBackColor2}" Offset="1"/>
+                    <GradientStop Color="{StaticResource primaryBackColor1}"
+                                  Offset="0.1"/>
+                    <GradientStop Color="{StaticResource primaryBackColor2}"
+                                  Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
 
-            <!-- Main grid container -->
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
-                    <!-- Allowing for more flexibility in space allocation -->
                 </Grid.RowDefinitions>
 
-                <!-- Title and close button section -->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -65,7 +69,6 @@
                                VerticalAlignment="Center"
                                Margin="10,0,0,0"/>
 
-                    <!-- Close button with custom style -->
                     <Button x:Name="CloseButton"
                             BorderThickness="0"
                             Content="X"
@@ -74,13 +77,15 @@
                             FontFamily="Montserrat"
                             Cursor="Hand"
                             Grid.Column="2"
-                            Click="OnClose_Click">
+                            Command="{Binding CloseCommand}">
+                        
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Background" 
                                         Value="{StaticResource closeButton}"/>
                                 <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True">
                                         <Setter Property="Background" 
                                                 Value="{StaticResource closeButtonHover}"/>
                                     </Trigger>
@@ -94,6 +99,7 @@
                                         Height="20"
                                         CornerRadius="8"
                                         Background="{TemplateBinding Background}">
+
                                     <ContentPresenter VerticalAlignment="Center"
                                                       HorizontalAlignment="Center"/>
                                 </Border>
@@ -102,9 +108,8 @@
                     </Button>
                 </Grid>
 
-                <!-- StackPanel to contain PlotView and make sure PlotView is centered -->
                 <oxy:PlotView Model="{Binding MyPlotModel}" 
-                              Height="750"
+                              Height="740"
                               Width="1350"
                               Grid.Row="1"
                               HorizontalAlignment="Center"

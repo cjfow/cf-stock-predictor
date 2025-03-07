@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\Images\arrow.png" />
     <None Remove="Resources\Images\background.png" />
@@ -15,18 +13,21 @@
     <None Remove="Resources\Images\minimize.png" />
     <None Remove="Resources\Images\stock.png" />
   </ItemGroup>
-
   <ItemGroup>
     <Page Remove="Resources\Styles\UIColors.xaml" />
   </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="Accord" Version="3.8.0" />
+    <PackageReference Include="Accord.MachineLearning" Version="3.8.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0-preview.1.25127.4" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="3.0.1" />
+    <PackageReference Include="Microsoft.ML.TimeSeries" Version="4.0.2" />
     <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
+    <PackageReference Include="Plotly.NET" Version="3.0.1" />
+    <PackageReference Include="YahooFinanceApi" Version="2.3.3" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\Images\arrow.png" />
     <Resource Include="Resources\Images\background.png" />
@@ -35,5 +36,7 @@
     <Resource Include="Resources\Images\stock.png" />
     <Resource Include="Resources\Styles\UIColors.xaml" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Folder Include="Resources\Data\" />
+  </ItemGroup>
 </Project>

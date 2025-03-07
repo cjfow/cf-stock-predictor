@@ -79,7 +79,7 @@
                             FontFamily="Montserrat"
                             Cursor="Hand"
                             Grid.Column="2"
-                            Click="OnClose">
+                            Command="{Binding CloseCommand}">
 
                         <Button.Style>
                             <Style TargetType="Button">
@@ -127,14 +127,14 @@
                     <Grid Width="240" 
                           Grid.Row="2" 
                           Margin="0,20,0,20">
-                        
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
- 
+
                             <ColumnDefinition Width="20"/>
 
                             <ColumnDefinition Width="*" />
-                            
+
                         </Grid.ColumnDefinitions>
 
                         <ListBox ItemsSource="{Binding ETFList}"
@@ -158,8 +158,6 @@
                                  VerticalAlignment="Top"
                                  Grid.Column="2"/>
                     </Grid>
-
-
                 </StackPanel>
             </Grid>
         </Border>

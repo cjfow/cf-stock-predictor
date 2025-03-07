@@ -22,9 +22,4 @@ public partial class TickerListView : Window
             DragMove();
         }
     }
-
-    private void OnClose(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
 }
