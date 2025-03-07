@@ -78,7 +78,7 @@
                             Cursor="Hand"
                             Grid.Column="2"
                             Command="{Binding CloseCommand}">
-                        
+
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Background" 
