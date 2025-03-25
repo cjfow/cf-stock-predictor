@@ -13,13 +13,18 @@ public class AccordMLModel
 
     public static void TrainModel(List<StockModel> stockData)
     {
-        // train the data using close prices over 20 years
+        if (stockData == null || stockData.Count == 0)
+        {
+            throw new InvalidOperationException("Stock data cannot be empty.");
+        }
+
         var inputs = stockData.Select(x => new double[] { (double)x.Close }).ToArray();
         var outputs = stockData.Select(x => (double)x.Close).ToArray();
 
         _olsModel = new OrdinaryLeastSquares();
         _regressionModel = _olsModel.Learn(inputs, outputs);
     }
+
 
     public static List<float> PredictFuturePrices(List<StockModel> stockData, int predictionHorizon)
     {
