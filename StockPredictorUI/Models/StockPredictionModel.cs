@@ -8,5 +8,5 @@ namespace StockPredictorUI.Models;
 public class StockPredictionModel
 {
     [ColumnName("PredictedClose")]
-    public float Close { get; set; }
+    public float FutureClose { get; set; }
 }
