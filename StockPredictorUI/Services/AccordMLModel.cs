@@ -1,4 +1,5 @@
 ﻿using Accord.Statistics.Models.Regression.Linear;
+using CommunityToolkit.Diagnostics;
 using StockPredictorUI.Models;
 
 namespace StockPredictorUI.Services;
@@ -13,12 +14,14 @@ public class AccordMLModel
 
     public static void TrainModel(List<StockModel> stockData)
     {
-        if (stockData == null || stockData.Count == 0)
+        Guard.IsNotNull(stockData);
+
+        if (stockData.Count == 0)
         {
             throw new InvalidOperationException("Stock data cannot be empty.");
         }
 
-        var inputs = stockData.Select(x => new double[] { (double)x.Close }).ToArray();
+        var inputs = stockData.Select(x => new double[] { x.Close }).ToArray();
         var outputs = stockData.Select(x => (double)x.Close).ToArray();
 
         _olsModel = new OrdinaryLeastSquares();
