@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using OxyPlot;
 using System.Windows.Input;
 using System.Windows;
+using CommunityToolkit.Diagnostics;
 
 namespace StockPredictorUI.ViewModels;
 
@@ -37,7 +38,9 @@ public class ChartViewModel
     // displays prediction graph
     private PlotModel CreatePlotModel(string stockTicker, List<float> predictedPrices, int predictionHorizon)
     {
-        if (predictedPrices == null || predictedPrices.Count == 0)
+        Guard.IsNotNull(predictedPrices);
+
+        if (predictedPrices.Count == 0)
         {
             throw new InvalidOperationException("Predicted stock data cannot be empty.");
         }
