@@ -26,7 +26,6 @@ public class APIDataAccess : IDataAccess
             }
             else
             {
-                // fetch stock data from alpha vantage if it's not in csv
                 stockData = await FetchStockDataFromAlphaVantageAsync(ticker);
 
                 if (stockData.Count == 0)
@@ -77,24 +76,24 @@ public class APIDataAccess : IDataAccess
         // check if the data exists
         var timeSeries = jsonObject["Time Series (Daily)"] ?? throw new Exception("No time series data found.");
 
-        // parse each days relevant stock data (nesting, ew, ik :s)
         foreach (var dayData in timeSeries)
         {
-            var dateStr = dayData.Path.Split('.').Last();
-            if (DateTime.TryParse(dateStr, out DateTime date))
+            string dateStr = dayData.Path.Split('.').Last();
+            if (!DateTime.TryParse(dateStr, out DateTime date))
+                continue;
+
+            JToken? dayInfo = dayData.First;
+            if (dayInfo == null)
+                continue;
+
+            stockData.Add(new StockModel
             {
-                var dayInfo = dayData.First;
-                if (dayInfo != null)
-                {
-                    stockData.Add(new StockModel
-                    {
-                        Ticker = (string?)jsonObject["Meta Data"]?["2. Symbol"],
-                        Date = date,
-                        Close = TryParseFloat((string?)dayInfo["4. close"])
-                    });
-                }
-            }
+                Ticker = (string?)jsonObject["Meta Data"]?["2. Symbol"],
+                Date = date,
+                Close = TryParseFloat((string?)dayInfo["4. close"])
+            });
         }
+
     }
 
     private bool IsTickerInCsv(string ticker, out List<StockModel> stockData)
@@ -108,7 +107,6 @@ public class APIDataAccess : IDataAccess
 
         var lines = File.ReadAllLines(fullFilePath);
 
-        // skip the header row
         foreach (var line in lines.Skip(1))
         {
             var parts = line.Split(',');
@@ -123,8 +121,6 @@ public class APIDataAccess : IDataAccess
                 });
             }
         }
-
-        // show most recent data first
         stockData.Reverse(); 
         return stockData.Count > 0;
     }

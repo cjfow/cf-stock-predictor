@@ -12,14 +12,14 @@ namespace StockPredictorUI.Views
     {
         private readonly ChartViewModel _chartViewModel;
 
-        // Constructor that accepts stock data
         public ChartView(string stockTicker, List<float> predictionData, int predictionHorizon)
         {
             InitializeComponent();
-            _chartViewModel = new ChartViewModel(stockTicker, predictionData, predictionHorizon); // Pass the stock data to the ViewModel
-            DataContext = _chartViewModel; // Set the DataContext to the ViewModel
+            _chartViewModel = new ChartViewModel(stockTicker, predictionData, predictionHorizon);
+            DataContext = _chartViewModel;
         }
 
+        // TODO: eventually I should probably make a command for this
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)

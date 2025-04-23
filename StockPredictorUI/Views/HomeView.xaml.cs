@@ -15,6 +15,7 @@ public partial class HomeView : Window
         DataContext = new HomeViewModel();
     }
 
+    // TODO: make a command
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)

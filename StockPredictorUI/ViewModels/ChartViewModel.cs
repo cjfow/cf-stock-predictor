@@ -5,6 +5,7 @@ using OxyPlot;
 using System.Windows.Input;
 using System.Windows;
 using CommunityToolkit.Diagnostics;
+using StockPredictorUI.Services;
 
 namespace StockPredictorUI.ViewModels;
 
@@ -35,15 +36,14 @@ public class ChartViewModel
         }
     }
 
-    // displays prediction graph
     private PlotModel CreatePlotModel(string stockTicker, List<float> predictedPrices, int predictionHorizon)
     {
-        Guard.IsNotNull(predictedPrices);
+        // throw if null or empty to make sure the list is usable below
+        if (predictedPrices == null)
+            throw new ArgumentNullException(nameof(predictedPrices), "Predicted stock data cannot be null.");
 
         if (predictedPrices.Count == 0)
-        {
             throw new InvalidOperationException("Predicted stock data cannot be empty.");
-        }
 
         int maxDays = predictionHorizon * 252;
         maxDays = Math.Min(maxDays, predictedPrices.Count);
@@ -59,21 +59,17 @@ public class ChartViewModel
             RenderInLegend = false
         };
 
-        // start at day 0 (today) and plot future prediction
         for (int i = 0; i < maxDays; i++)
         {
-            // truncate the predicted price to 2 decimal places
             var truncatedPrice = Math.Floor(predictedPrices[i] * 100) / 100;
             predictionLineSeries.Points.Add(new DataPoint(i, truncatedPrice));
         }
 
         model.Series.Add(predictionLineSeries);
 
-        // y axis scaling based on predicted prices
         double minY = predictedPrices.Min() - 10;
         double maxY = predictedPrices.Max() + 10;
 
-        // x axis format
         var xAxis = new LinearAxis
         {
             Position = AxisPosition.Bottom,
@@ -82,26 +78,16 @@ public class ChartViewModel
             FontSize = 12,
             Minimum = 0,
             Maximum = maxDays - 1,
-
-            // 1 trading month
             MajorStep = 21,
-
             MinorStep = 1,
             MajorGridlineStyle = LineStyle.None,
             MinorGridlineStyle = LineStyle.None,
             AxislineStyle = LineStyle.None,
             AbsoluteMinimum = 0,
             AbsoluteMaximum = maxDays - 1,
-
-            // label the x axis with months
-            LabelFormatter = (val) =>
-                {
-                    int months = (int)(val / 21);
-                    return $"{months}m";
-                }
+            LabelFormatter = val => $"{(int)(val / 21)}m"
         };
 
-        // y axis format
         var yAxis = new LinearAxis
         {
             Position = AxisPosition.Left,
@@ -125,4 +111,5 @@ public class ChartViewModel
 
         return model;
     }
+
 }

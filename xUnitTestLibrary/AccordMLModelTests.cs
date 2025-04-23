@@ -1,4 +1,12 @@
-﻿using StockPredictorUI.Models;
+﻿/* using the AAA pattern (arrange, act, assert)
+ * basically:
+ * Arrange - setup objects/data
+ * Act - call the method or perform an action
+ * Assert - check that the result matches the expected outcome
+ * side note: sometimes act and assert are done on the same line in anon methods
+ */ 
+
+using StockPredictorUI.Models;
 using StockPredictorUI.Services;
 
 namespace xUnitTestLibrary;
@@ -8,7 +16,6 @@ public class AccordMLModelTests
     [Fact]
     public void TrainModel_ShouldNotThrowException_WithValidData()
     {
-        // arrange
         var stockData = new List<StockModel>
     {
         new() { Close = 100 },
@@ -16,7 +23,6 @@ public class AccordMLModelTests
         new() { Close = 110 }
     };
 
-        // act and assert
         var exception = Record.Exception(() => AccordMLModel.TrainModel(stockData));
         Assert.Null(exception);
     }
@@ -24,17 +30,15 @@ public class AccordMLModelTests
     [Fact]
     public void TrainModel_ShouldThrowException_WithEmptyData()
     {
-        // arrange
         var stockData = new List<StockModel>();
 
-        // act and assert
+        // an example of act and assert combined
         Assert.Throws<InvalidOperationException>(() => AccordMLModel.TrainModel(stockData));
     }
 
     [Fact]
     public void PredictFuturePrices_ShouldReturnCorrectCount()
     {
-        // arrange
         var stockData = new List<StockModel>
     {
         new() { Close = 100 },
@@ -45,10 +49,8 @@ public class AccordMLModelTests
 
         AccordMLModel.TrainModel(stockData);
 
-        // act
         var predictions = AccordMLModel.PredictFuturePrices(stockData, predictionHorizon);
 
-        // assert
         Assert.NotNull(predictions);
         Assert.Equal(predictionHorizon * 252, predictions.Count);
     }
@@ -56,11 +58,9 @@ public class AccordMLModelTests
     [Fact]
     public void PredictFuturePrices_ShouldThrowException_WhenStockDataIsEmpty()
     {
-        // arrange
         var stockData = new List<StockModel>();
         int predictionHorizon = 2;
 
-        // act and assert
         Assert.Throws<InvalidOperationException>(() => AccordMLModel.PredictFuturePrices(stockData, predictionHorizon));
     }
 }

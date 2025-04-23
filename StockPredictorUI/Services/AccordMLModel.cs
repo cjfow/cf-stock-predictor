@@ -44,7 +44,6 @@ public class AccordMLModel
 
         for (int i = 0; i < predictionHorizon * 252; i++)
         {
-            // apply the trend
             lastKnownPrice *= (1 + dailyTrend);
             
             double randomFactor = rand.NextDouble() * 0.0095 - 0.0045;
