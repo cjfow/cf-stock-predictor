@@ -1,5 +1,5 @@
-﻿using StockPredictorUI.Models;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using StockPredictorUI.Models;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -96,7 +96,7 @@ public class APIDataAccess : IDataAccess
 
     }
 
-    private bool IsTickerInCsv(string ticker, out List<StockModel> stockData)
+    private static bool IsTickerInCsv(string ticker, out List<StockModel> stockData)
     {
         stockData = [];
 
@@ -121,11 +121,11 @@ public class APIDataAccess : IDataAccess
                 });
             }
         }
-        stockData.Reverse(); 
+        stockData.Reverse();
         return stockData.Count > 0;
     }
 
-    public async Task SaveStockDataToCsvAsync(List<StockModel> stockData)
+    public static async Task SaveStockDataToCsvAsync(List<StockModel> stockData)
     {
         if (stockData.Count == 0) return;
 

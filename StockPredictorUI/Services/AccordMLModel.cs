@@ -9,25 +9,19 @@ namespace StockPredictorUI.Services;
 /// </summary>
 public class AccordMLModel
 {
-    private static OrdinaryLeastSquares? _olsModel;
-    private static MultipleLinearRegression? _regressionModel;
+    private static OrdinaryLeastSquares? _olsRegressionModel;
 
     public static void TrainModel(List<StockModel> stockData)
     {
         Guard.IsNotNull(stockData);
-
-        if (stockData.Count == 0)
-        {
-            throw new InvalidOperationException("Stock data cannot be empty.");
-        }
+        Guard.HasSizeGreaterThan(stockData, 0);
 
         var inputs = stockData.Select(x => new double[] { x.Close }).ToArray();
         var outputs = stockData.Select(x => (double)x.Close).ToArray();
 
-        _olsModel = new OrdinaryLeastSquares();
-        _regressionModel = _olsModel.Learn(inputs, outputs);
+        _olsRegressionModel = new OrdinaryLeastSquares();
+        _olsRegressionModel.Learn(inputs, outputs);
     }
-
 
     public static List<float> PredictFuturePrices(List<StockModel> stockData, int predictionHorizon)
     {
@@ -45,7 +39,7 @@ public class AccordMLModel
         for (int i = 0; i < predictionHorizon * 252; i++)
         {
             lastKnownPrice *= (1 + dailyTrend);
-            
+
             double randomFactor = rand.NextDouble() * 0.0095 - 0.0045;
             lastKnownPrice *= (1 + randomFactor);
 

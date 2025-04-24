@@ -59,6 +59,7 @@ public class HomeViewModel : INotifyPropertyChanged
 
     private async void OpenChart()
     {
+        // TODO: pull relevant tickers from a db
         var validTickers = new HashSet<string> { "SPY", "QQQ", "IWM", "EFA", "EEM", "VFIAX", "FXAIX", "VTSAX", "VTIAX", "SWPPX" };
 
         if (!validTickers.Contains(StockTicker))

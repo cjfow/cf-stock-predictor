@@ -36,7 +36,7 @@ public class ChartViewModel
         }
     }
 
-    private PlotModel CreatePlotModel(string stockTicker, List<float> predictedPrices, int predictionHorizon)
+    private static PlotModel CreatePlotModel(string stockTicker, List<float> predictedPrices, int predictionHorizon)
     {
         // throw if null or empty to make sure the list is usable below
         if (predictedPrices == null)

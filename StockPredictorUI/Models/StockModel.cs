@@ -15,5 +15,4 @@ public class StockModel
 
     [ColumnName("Close")]
     public float Close { get; set; }
-
 }
