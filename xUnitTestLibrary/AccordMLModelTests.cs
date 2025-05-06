@@ -28,12 +28,12 @@ public class AccordMLModelTests
     }
 
     [Fact]
-    public void TrainModel_ShouldThrowException_WithEmptyData()
+    public void TrainModel_ShouldThrowArgumentException_WithEmptyData()
     {
         var stockData = new List<StockModel>();
 
         // an example of act and assert combined
-        Assert.Throws<InvalidOperationException>(() => AccordMLModel.TrainModel(stockData));
+        Assert.Throws<ArgumentException>(() => AccordMLModel.TrainModel(stockData));
     }
 
     [Fact]

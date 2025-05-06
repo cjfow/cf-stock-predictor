@@ -12,7 +12,7 @@ namespace StockPredictorUI.Services;
 public class APIDataAccess : IDataAccess
 {
     private const string _csvFileName = "stock_data.csv";
-    private static readonly HttpClient client = new();
+    private static readonly HttpClient _client = new();
     private const string _alphaVantageApiKey = "ZGLATOL0IYYJKNIS";
     private const string _dataFolderPath = @"C:\Users\cfowl\source\repos\CF_StockPredictor\StockPredictorUI\Resources\Data";
 
@@ -60,7 +60,7 @@ public class APIDataAccess : IDataAccess
 
     private static async Task FetchDataForPeriodAsync(string url, List<StockModel> stockData)
     {
-        var response = await client.GetAsync(url);
+        var response = await _client.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
 
         Console.WriteLine($"API Response: {responseContent}");

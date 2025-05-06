@@ -13,11 +13,15 @@ public class AccordMLModel
 
     public static void TrainModel(List<StockModel> stockData)
     {
-        Guard.IsNotNull(stockData);
-        Guard.HasSizeGreaterThan(stockData, 0);
 
-        var inputs = stockData.Select(x => new double[] { x.Close }).ToArray();
-        var outputs = stockData.Select(x => (double)x.Close).ToArray();
+        Guard.IsNotNull(stockData);
+        Guard.HasSizeGreaterThan(stockData, 1);
+
+        var inputs = stockData.Select(x => new double[] { x.Close })
+                              .ToArray();
+
+        var outputs = stockData.Select(x => (double)x.Close)
+                               .ToArray();
 
         _olsRegressionModel = new OrdinaryLeastSquares();
         _olsRegressionModel.Learn(inputs, outputs);
@@ -28,7 +32,6 @@ public class AccordMLModel
         double lastKnownPrice = stockData.Last().Close;
         List<float> predictedPrices = [];
 
-        // calculate the overall trend
         double startPrice = stockData.First().Close;
         double endPrice = stockData.Last().Close;
         double trendPercent = (endPrice - startPrice) / startPrice;

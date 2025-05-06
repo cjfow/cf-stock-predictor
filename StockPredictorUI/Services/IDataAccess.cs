@@ -1,6 +1,4 @@
-﻿using StockPredictorUI.Models;
-
-namespace StockPredictorUI.Services;
+﻿namespace StockPredictorUI.Services;
 
 /// <summary>
 /// Data access interface

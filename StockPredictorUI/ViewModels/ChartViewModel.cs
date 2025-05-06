@@ -1,11 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using OxyPlot;
-using System.Windows.Input;
 using System.Windows;
-using CommunityToolkit.Diagnostics;
-using StockPredictorUI.Services;
+using System.Windows.Input;
 
 namespace StockPredictorUI.ViewModels;
 

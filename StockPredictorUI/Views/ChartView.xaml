@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:StockPredictorUI.Views"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:viewmodels="clr-namespace:StockPredictorUI.ViewModels"
-        d:DataContext="{d:DesignInstance Type=viewmodels:ChartViewModel}"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         Background="Transparent"
