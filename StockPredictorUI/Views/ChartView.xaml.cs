@@ -1,5 +1,4 @@
 ﻿using StockPredictorUI.ViewModels;
-using StockPredictorUI.Models;
 using System.Windows;
 using System.Windows.Input;
 
@@ -19,7 +18,7 @@ namespace StockPredictorUI.Views
             DataContext = _chartViewModel;
         }
 
-        // TODO: eventually I should probably make a command for this
+        // TODO: make a command for this
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)

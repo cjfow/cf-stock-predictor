@@ -9,7 +9,7 @@ namespace StockPredictorUI.Services;
 /// </summary>
 public class AccordMLModel
 {
-    private static OrdinaryLeastSquares? _olsRegressionModel;
+    private static OrdinaryLeastSquares? s_olsRegressionModel;
 
     public static void TrainModel(List<StockModel> stockData)
     {
@@ -23,8 +23,8 @@ public class AccordMLModel
         var outputs = stockData.Select(x => (double)x.Close)
                                .ToArray();
 
-        _olsRegressionModel = new OrdinaryLeastSquares();
-        _olsRegressionModel.Learn(inputs, outputs);
+        s_olsRegressionModel = new OrdinaryLeastSquares();
+        s_olsRegressionModel.Learn(inputs, outputs);
     }
 
     public static List<float> PredictFuturePrices(List<StockModel> stockData, int predictionHorizon)

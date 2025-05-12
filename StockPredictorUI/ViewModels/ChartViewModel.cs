@@ -38,10 +38,14 @@ public class ChartViewModel
     {
         // throw if null or empty to make sure the list is usable below
         if (predictedPrices == null)
+        {
             throw new ArgumentNullException(nameof(predictedPrices), "Predicted stock data cannot be null.");
+        }
 
         if (predictedPrices.Count == 0)
+        {
             throw new InvalidOperationException("Predicted stock data cannot be empty.");
+        }
 
         int maxDays = predictionHorizon * 252;
         maxDays = Math.Min(maxDays, predictedPrices.Count);
@@ -109,5 +113,4 @@ public class ChartViewModel
 
         return model;
     }
-
 }

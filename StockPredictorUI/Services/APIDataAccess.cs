@@ -11,10 +11,10 @@ namespace StockPredictorUI.Services;
 /// </summary>
 public class APIDataAccess : IDataAccess
 {
-    private const string _csvFileName = "stock_data.csv";
-    private static readonly HttpClient _client = new();
-    private const string _alphaVantageApiKey = "ZGLATOL0IYYJKNIS";
-    private const string _dataFolderPath = @"C:\Users\cfowl\source\repos\CF_StockPredictor\StockPredictorUI\Resources\Data";
+    private const string c_CsvFileName = "stock_data.csv";
+    private static readonly HttpClient s_client = new();
+    private const string c_AlphaVantageApiKey = "ZGLATOL0IYYJKNIS";
+    private const string c_DataFolderPath = @"C:\Users\cfowl\source\repos\CF_StockPredictor\StockPredictorUI\Resources\Data";
 
     public async Task<List<float>> GetStockDataAsync(string ticker, int predictionHorizon)
     {
@@ -29,7 +29,9 @@ public class APIDataAccess : IDataAccess
                 stockData = await FetchStockDataFromAlphaVantageAsync(ticker);
 
                 if (stockData.Count == 0)
+                {
                     throw new Exception("No data available for this ticker.");
+                }
 
                 await SaveStockDataToCsvAsync(stockData);
             }
@@ -51,7 +53,7 @@ public class APIDataAccess : IDataAccess
     private static async Task<List<StockModel>> FetchStockDataFromAlphaVantageAsync(string ticker)
     {
         var stockData = new List<StockModel>();
-        var apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={_alphaVantageApiKey}&outputsize=full";
+        var apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={c_AlphaVantageApiKey}&outputsize=full";
 
         await FetchDataForPeriodAsync(apiUrl, stockData);
 
@@ -60,7 +62,7 @@ public class APIDataAccess : IDataAccess
 
     private static async Task FetchDataForPeriodAsync(string url, List<StockModel> stockData)
     {
-        var response = await _client.GetAsync(url);
+        var response = await s_client.GetAsync(url);
         string responseContent = await response.Content.ReadAsStringAsync();
 
         Console.WriteLine($"API Response: {responseContent}");
@@ -80,11 +82,15 @@ public class APIDataAccess : IDataAccess
         {
             string dateStr = dayData.Path.Split('.').Last();
             if (!DateTime.TryParse(dateStr, out DateTime date))
+            {
                 continue;
+            }
 
             JToken? dayInfo = dayData.First;
             if (dayInfo == null)
+            {
                 continue;
+            }
 
             stockData.Add(new StockModel
             {
@@ -100,10 +106,12 @@ public class APIDataAccess : IDataAccess
     {
         stockData = [];
 
-        string fullFilePath = Path.Combine(_dataFolderPath, _csvFileName);
+        string fullFilePath = Path.Combine(c_DataFolderPath, c_CsvFileName);
 
         if (!File.Exists(fullFilePath))
+        {
             return false;
+        }
 
         var lines = File.ReadAllLines(fullFilePath);
 
@@ -127,14 +135,17 @@ public class APIDataAccess : IDataAccess
 
     public static async Task SaveStockDataToCsvAsync(List<StockModel> stockData)
     {
-        if (stockData.Count == 0) return;
-
-        if (!Directory.Exists(_dataFolderPath))
+        if (stockData.Count == 0)
         {
-            Directory.CreateDirectory(_dataFolderPath);
+            return;
         }
 
-        string fullFilePath = Path.Combine(_dataFolderPath, _csvFileName);
+        if (!Directory.Exists(c_DataFolderPath))
+        {
+            Directory.CreateDirectory(c_DataFolderPath);
+        }
+
+        string fullFilePath = Path.Combine(c_DataFolderPath, c_CsvFileName);
 
         var sb = new StringBuilder();
         sb.AppendLine("Ticker,Date,Close");

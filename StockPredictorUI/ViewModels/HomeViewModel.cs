@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
-using System.Windows;
-using StockPredictorUI.Views;
+﻿using CommunityToolkit.Mvvm.Input;
 using StockPredictorUI.Services;
-using CommunityToolkit.Mvvm.Input;
+using StockPredictorUI.Views;
+using System.ComponentModel;
+using System.Windows;
 
 namespace StockPredictorUI.ViewModels;
 
