@@ -34,7 +34,4 @@
     <Resource Include="Resources\Images\stock.png" />
     <Resource Include="Resources\Styles\UIColors.xaml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\Data\" />
-  </ItemGroup>
 </Project>

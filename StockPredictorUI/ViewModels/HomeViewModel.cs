@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using Accord.Math;
+using CommunityToolkit.Mvvm.Input;
 using StockPredictorUI.Services;
 using StockPredictorUI.Views;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 
 namespace StockPredictorUI.ViewModels;
@@ -13,6 +15,7 @@ public class HomeViewModel : INotifyPropertyChanged
 {
     private string _stockTicker = "QQQ";
     private int _predictionHorizon = 1;
+    private readonly string _csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Data", "validTickers.csv");
 
     public string StockTicker
     {
@@ -59,8 +62,18 @@ public class HomeViewModel : INotifyPropertyChanged
 
     private async void OpenChart()
     {
+        if (!File.Exists(_csvPath))
+        {
+            throw new FileNotFoundException("validTickers.csv was not found.");
+        }
+
+        var csvContent = File.ReadAllText(_csvPath);
+
         // TODO: pull relevant tickers from a db
-        var validTickers = new HashSet<string> { "SPY", "QQQ", "IWM", "EFA", "EEM", "VFIAX", "FXAIX", "VTSAX", "VTIAX", "SWPPX" };
+        var validTickers = csvContent.Split(',')
+            .Select(t => t.Trim())
+            .Where(t => !string.IsNullOrEmpty(t))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         if (!validTickers.Contains(StockTicker))
         {
@@ -68,7 +81,7 @@ public class HomeViewModel : INotifyPropertyChanged
             return;
         }
 
-        List<float> predictionData = await _apiDataAccess.GetStockDataAsync(StockTicker, PredictionHorizon);
+        var predictionData = await _apiDataAccess.GetStockDataAsync(StockTicker, PredictionHorizon);
 
         if (predictionData == null || predictionData.Count < PredictionHorizon * 250)
         {
