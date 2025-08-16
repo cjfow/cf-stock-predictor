@@ -1,21 +1,18 @@
-﻿using Accord.Math;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using StockPredictorUI.Services;
 using StockPredictorUI.Views;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 
 namespace StockPredictorUI.ViewModels;
 
-/// <summary>
-/// gathers and manages user input for the ticker and prediction horizon, handles UI commands
-/// </summary>
 public class HomeViewModel : INotifyPropertyChanged
 {
     private string _stockTicker = "QQQ";
     private int _predictionHorizon = 1;
-    private readonly string _csvPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Data", "validTickers.csv");
+    private readonly IDataAccess _dataAccess;
+    private readonly ITickerDataService _tickerDataService;
 
     public string StockTicker
     {
@@ -48,71 +45,52 @@ public class HomeViewModel : INotifyPropertyChanged
     public RelayCommand MinimizeCommand { get; }
     public RelayCommand CloseCommand { get; }
 
-    private readonly APIDataAccess _apiDataAccess;
-
-    public HomeViewModel()
+    public HomeViewModel(IDataAccess dataAccess, ITickerDataService tickerDataService)
     {
+        _dataAccess = dataAccess;
+        _tickerDataService = tickerDataService;
         OpenChartCommand = new RelayCommand(OpenChart);
         OpenTickerListCommand = new RelayCommand(OpenTickerList);
         MinimizeCommand = new RelayCommand(OnMinimize);
         CloseCommand = new RelayCommand(OnClose);
-
-        _apiDataAccess = new APIDataAccess();
     }
 
     private async void OpenChart()
     {
-        if (!File.Exists(_csvPath))
+        try
         {
-            throw new FileNotFoundException("validTickers.csv was not found.");
+            List<string> validTickers = await _tickerDataService.GetValidTickerSymbolsAsync();
+            HashSet<string> validTickerSet = validTickers.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            if (!validTickerSet.Contains(StockTicker))
+            {
+                MessageBox.Show("Invalid stock ticker. Please enter a supported ticker.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            List<double> predictionData = await _dataAccess.GetStockDataAsync(StockTicker, PredictionHorizon);
+            ChartView chartView = new(StockTicker, predictionData, PredictionHorizon);
+            chartView.Show();
         }
-
-        var csvContent = File.ReadAllText(_csvPath);
-
-        // TODO: pull relevant tickers from a db
-        var validTickers = csvContent.Split(',')
-            .Select(t => t.Trim())
-            .Where(t => !string.IsNullOrEmpty(t))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if (!validTickers.Contains(StockTicker))
+        catch (Exception ex)
         {
-            MessageBox.Show("Invalid stock ticker. Please enter a supported ticker.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
+            MessageBox.Show($"Failed to fetch stock data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-
-        var predictionData = await _apiDataAccess.GetStockDataAsync(StockTicker, PredictionHorizon);
-
-        if (predictionData == null || predictionData.Count < PredictionHorizon * 250)
-        {
-            MessageBox.Show("Failed to fetch valid stock data. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-
-        ChartView chartView = new(StockTicker, predictionData, PredictionHorizon);
-        chartView.Show();
     }
 
     private void OpenTickerList()
     {
-        TickerListView tickerListView = new();
-        tickerListView.Show();
+        App app = (App)Application.Current;
+        TickerListView? tickerListView = app.Host?.Services.GetRequiredService<TickerListView>();
+        tickerListView?.Show();
     }
 
-    private void OnMinimize()
-    {
-        Application.Current.MainWindow.WindowState = WindowState.Minimized;
-    }
+    private void OnMinimize() => Application.Current.MainWindow.WindowState = WindowState.Minimized;
 
-    private void OnClose()
-    {
-        Application.Current.Shutdown();
-    }
+    private void OnClose() => Application.Current.Shutdown();
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
+    
+    protected virtual void OnPropertyChanged(string propertyName) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }

@@ -1,30 +1,25 @@
-﻿using StockPredictorUI.ViewModels;
+﻿using Microsoft.Extensions.DependencyInjection;
+using StockPredictorUI.Services;
+using StockPredictorUI.ViewModels;
 using System.Windows;
 using System.Windows.Input;
 
-namespace StockPredictorUI.Views
+namespace StockPredictorUI.Views;
+
+public partial class ChartView : Window
 {
-    /// <summary>
-    /// Interaction logic for ChartView.xaml
-    /// </summary>
-    public partial class ChartView : Window
+    public ChartView(string stockTicker, List<double> predictionData, int predictionHorizon)
     {
-        private readonly ChartViewModel _chartViewModel;
+        InitializeComponent();
 
-        public ChartView(string stockTicker, List<float> predictionData, int predictionHorizon)
-        {
-            InitializeComponent();
-            _chartViewModel = new ChartViewModel(stockTicker, predictionData, predictionHorizon);
-            DataContext = _chartViewModel;
-        }
+        IStockConfiguration? configuration = ((App)Application.Current).Host?.Services.GetRequiredService<IStockConfiguration>();
+        ChartViewModel chartViewModel = new(stockTicker, predictionData, predictionHorizon, configuration!);
+        DataContext = chartViewModel;
+    }
 
-        // TODO: make a command for this
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                DragMove();
-            }
-        }
+    private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed)
+            DragMove();
     }
 }

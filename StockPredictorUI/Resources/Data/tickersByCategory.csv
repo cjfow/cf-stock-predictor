@@ -1,0 +1,11 @@
+Symbol,Name,Category,Description
+SPY,SPDR S&P 500 ETF Trust,ETF,Tracks S&P 500 index
+QQQ,Invesco QQQ Trust,ETF,Tracks Nasdaq-100 index
+IWM,iShares Russell 2000 ETF,ETF,Tracks Russell 2000 small-cap index
+EFA,iShares MSCI EAFE ETF,ETF,Tracks international developed markets
+EEM,iShares MSCI Emerging Markets ETF,ETF,Tracks emerging markets
+VFIAX,Vanguard 500 Index Fund Admiral Shares,IndexFund,S&P 500 index mutual fund
+FXAIX,Fidelity 500 Index Fund,IndexFund,S&P 500 index mutual fund
+VTSAX,Vanguard Total Stock Market Index Fund Admiral Shares,IndexFund,Total US stock market index fund
+VTIAX,Vanguard Total International Stock Index Fund Admiral Shares,IndexFund,International stock index fund
+SWPPX,Schwab S&P 500 Index Fund,IndexFund,S&P 500 index mutual fund

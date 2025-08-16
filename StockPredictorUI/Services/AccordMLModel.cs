@@ -4,49 +4,40 @@ using StockPredictorUI.Models;
 
 namespace StockPredictorUI.Services;
 
-/// <summary>
-/// Class for training and running the Accord machine learning model
-/// </summary>
-public class AccordMLModel
+public class AccordMLModel(IStockConfiguration configuration) : IStockPredictionModel
 {
-    private static OrdinaryLeastSquares? s_olsRegressionModel;
+    private readonly IStockConfiguration _configuration = configuration;
+    private OrdinaryLeastSquares? _olsRegressionModel;
 
-    public static void TrainModel(List<StockModel> stockData)
+    public void TrainModel(List<StockModel> stockData)
     {
-
         Guard.IsNotNull(stockData);
         Guard.HasSizeGreaterThan(stockData, 1);
 
-        var inputs = stockData.Select(x => new double[] { x.Close })
-                              .ToArray();
-
-        var outputs = stockData.Select(x => (double)x.Close)
-                               .ToArray();
-
-        s_olsRegressionModel = new OrdinaryLeastSquares();
-        s_olsRegressionModel.Learn(inputs, outputs);
+        double[][] inputs = [.. stockData.Select(x => new double[] { x.Close })];
+        double[] outputs = [.. stockData.Select(x => (double)x.Close)];
+        _olsRegressionModel = new OrdinaryLeastSquares();
+        _olsRegressionModel.Learn(inputs, outputs);
     }
 
-    public static List<float> PredictFuturePrices(List<StockModel> stockData, int predictionHorizon)
+    public List<double> PredictFuturePrices(List<StockModel> stockData, int predictionHorizon)
     {
-        double lastKnownPrice = stockData.Last().Close;
-        List<float> predictedPrices = [];
+        Random random = new();
+        List<double> predictedPrices = [];
 
+        double lastKnownPrice = stockData.Last().Close;
         double startPrice = stockData.First().Close;
         double endPrice = stockData.Last().Close;
         double trendPercent = (endPrice - startPrice) / startPrice;
-        double dailyTrend = (trendPercent / stockData.Count) * 0.15;
+        double dailyTrend = (trendPercent / stockData.Count) * _configuration.DailyTrendMultiplier;
+        int totalPredictionDays = predictionHorizon * _configuration.TradingDaysPerYear;
 
-        Random rand = new();
-
-        for (int i = 0; i < predictionHorizon * 252; i++)
+        for (var i = 0; i < totalPredictionDays; i++)
         {
             lastKnownPrice *= (1 + dailyTrend);
-
-            double randomFactor = rand.NextDouble() * 0.0095 - 0.0045;
+            double randomFactor = random.NextDouble() * _configuration.MaxRandomVolatilityFactor + _configuration.MinRandomVolatilityFactor;
             lastKnownPrice *= (1 + randomFactor);
-
-            predictedPrices.Add((float)lastKnownPrice);
+            predictedPrices.Add(lastKnownPrice);
         }
         return predictedPrices;
     }

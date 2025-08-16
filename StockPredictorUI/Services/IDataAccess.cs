@@ -5,5 +5,5 @@
 /// </summary>
 public interface IDataAccess
 {
-    Task<List<float>> GetStockDataAsync(string ticker, int predictionHorizon);
+    Task<List<double>> GetStockDataAsync(string ticker, int predictionHorizon);
 }

@@ -4,23 +4,17 @@ using System.Windows.Input;
 
 namespace StockPredictorUI.Views;
 
-/// <summary>
-/// Interaction logic for TickerListView.xaml
-/// </summary>
 public partial class TickerListView : Window
 {
-    public TickerListView()
+    public TickerListView(TickerListViewModel viewModel)
     {
         InitializeComponent();
-        DataContext = new TickerListViewModel();
+        DataContext = viewModel;
     }
 
-    // TODO: make a command
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
-        {
             DragMove();
-        }
     }
 }

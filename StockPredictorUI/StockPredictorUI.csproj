@@ -21,6 +21,8 @@
     <PackageReference Include="Accord.MachineLearning" Version="3.8.0" />
     <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.4.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
     <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
@@ -33,5 +35,11 @@
     <Resource Include="Resources\Images\minimize.png" />
     <Resource Include="Resources\Images\stock.png" />
     <Resource Include="Resources\Styles\UIColors.xaml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Resources\Data\tickersByCategory.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

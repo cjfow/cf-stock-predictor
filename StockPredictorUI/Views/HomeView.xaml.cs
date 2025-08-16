@@ -4,23 +4,17 @@ using System.Windows.Input;
 
 namespace StockPredictorUI.Views;
 
-/// <summary>
-/// Interaction logic for HomeView.xaml
-/// </summary>
 public partial class HomeView : Window
 {
-    public HomeView()
+    public HomeView(HomeViewModel viewModel)
     {
         InitializeComponent();
-        DataContext = new HomeViewModel();
+        DataContext = viewModel;
     }
 
-    // TODO: make a command
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
-        {
             DragMove();
-        }
     }
 }

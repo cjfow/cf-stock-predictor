@@ -14,5 +14,5 @@ public class StockModel
     public DateTime Date { get; set; }
 
     [ColumnName("Close")]
-    public float Close { get; set; }
+    public double Close { get; set; }
 }

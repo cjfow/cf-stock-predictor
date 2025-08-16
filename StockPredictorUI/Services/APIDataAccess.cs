@@ -6,126 +6,101 @@ using System.Text;
 
 namespace StockPredictorUI.Services;
 
-/// <summary>
-/// Fetches historical data via the AlphaVantage stock API
-/// </summary>
-public class APIDataAccess : IDataAccess
+public class APIDataAccess(IStockConfiguration configuration, IStockPredictionModel predictionModel) : IDataAccess
 {
-    private const string c_CsvFileName = "stock_data.csv";
-    private static readonly HttpClient s_client = new();
-    private const string c_AlphaVantageApiKey = "ZGLATOL0IYYJKNIS";
-    private const string c_DataFolderPath = @"C:\Users\cfowl\source\repos\CF_StockPredictor\StockPredictorUI\Resources\Data";
+    private const string _csvFileName = "stock_data.csv";
+    private static readonly HttpClient _httpClient = new();
+    private readonly IStockConfiguration _configuration = configuration;
+    private readonly IStockPredictionModel _predictionModel = predictionModel;
 
-    public async Task<List<float>> GetStockDataAsync(string ticker, int predictionHorizon)
+    public async Task<List<double>> GetStockDataAsync(string ticker, int predictionHorizon)
     {
         try
         {
-            if (IsTickerInCsv(ticker, out List<StockModel> stockData))
-            {
-                Console.WriteLine($"Loaded {stockData.Count} records from CSV for {ticker}");
-            }
-            else
-            {
-                stockData = await FetchStockDataFromAlphaVantageAsync(ticker);
+            List<StockModel> stockData = IsTickerInCsv(ticker, out List<StockModel>? cachedData) 
+                ? cachedData 
+                : await FetchAndCacheStockDataAsync(ticker);
 
-                if (stockData.Count == 0)
-                {
-                    throw new Exception("No data available for this ticker.");
-                }
+            if (stockData.Count < _configuration.MinimumDataPointsForTraining)
+                throw new InvalidOperationException($"Insufficient data points for ticker {ticker}. Required: {_configuration.MinimumDataPointsForTraining}, Available: {stockData.Count}");
 
-                await SaveStockDataToCsvAsync(stockData);
-            }
-
-            Console.WriteLine($"Test for valid data: {stockData.Count}");
-
-            AccordMLModel.TrainModel(stockData);
-
-            List<float> predictions = AccordMLModel.PredictFuturePrices(stockData, predictionHorizon);
-
-            return predictions;
+            _predictionModel.TrainModel(stockData);
+            return _predictionModel.PredictFuturePrices(stockData, predictionHorizon);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Error occurred while fetching and predicting stock data.", ex);
+            throw new InvalidOperationException($"Error occurred while fetching and predicting stock data for {ticker}.", ex);
         }
     }
 
-    private static async Task<List<StockModel>> FetchStockDataFromAlphaVantageAsync(string ticker)
+    private async Task<List<StockModel>> FetchAndCacheStockDataAsync(string ticker)
     {
-        var stockData = new List<StockModel>();
-        var apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={c_AlphaVantageApiKey}&outputsize=full";
+        List<StockModel> stockData = await FetchStockDataFromAlphaVantageAsync(ticker);
+        if (stockData.Count == 0)
+            throw new InvalidOperationException($"No data available for ticker {ticker}.");
 
-        await FetchDataForPeriodAsync(apiUrl, stockData);
-
+        await SaveStockDataToCsvAsync(stockData);
         return stockData;
     }
 
-    private static async Task FetchDataForPeriodAsync(string url, List<StockModel> stockData)
+    private async Task<List<StockModel>> FetchStockDataFromAlphaVantageAsync(string ticker)
     {
-        var response = await s_client.GetAsync(url);
-        string responseContent = await response.Content.ReadAsStringAsync();
+        string apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={_configuration.AlphaVantageApiKey}&outputsize=full";
+        return await FetchDataForPeriodAsync(apiUrl);
+    }
 
-        Console.WriteLine($"API Response: {responseContent}");
-
+    private static async Task<List<StockModel>> FetchDataForPeriodAsync(string url)
+    {
+        var response = await _httpClient.GetAsync(url);
         if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception($"Failed to fetch stock data: {response.StatusCode}");
-        }
+            throw new HttpRequestException($"Failed to fetch stock data: {response.StatusCode}");
 
-        var jsonData = await response.Content.ReadAsStringAsync();
-        var jsonObject = JObject.Parse(jsonData);
+        string jsonData = await response.Content.ReadAsStringAsync();
+        JObject jsonObject = JObject.Parse(jsonData);
+        JToken timeSeries = jsonObject["Time Series (Daily)"]
+            ?? throw new InvalidOperationException("No time series data found in API response.");
 
-        // check if the data exists
-        var timeSeries = jsonObject["Time Series (Daily)"] ?? throw new Exception("No time series data found.");
+        List<StockModel> stockData = [];
 
         foreach (var dayData in timeSeries)
         {
             string dateStr = dayData.Path.Split('.').Last();
-            if (!DateTime.TryParse(dateStr, out DateTime date))
-            {
+            if (!DateTime.TryParse(dateStr, out var date))
                 continue;
-            }
 
             JToken? dayInfo = dayData.First;
-            if (dayInfo == null)
-            {
+            if (dayInfo is null)
                 continue;
-            }
 
             stockData.Add(new StockModel
             {
                 Ticker = (string?)jsonObject["Meta Data"]?["2. Symbol"],
                 Date = date,
-                Close = TryParseFloat((string?)dayInfo["4. close"])
+                Close = TryParseDouble((string?)dayInfo["4. close"])
             });
         }
-
+        return stockData;
     }
 
-    private static bool IsTickerInCsv(string ticker, out List<StockModel> stockData)
+    private bool IsTickerInCsv(string ticker, out List<StockModel> stockData)
     {
         stockData = [];
-
-        string fullFilePath = Path.Combine(c_DataFolderPath, c_CsvFileName);
+        string fullFilePath = Path.Combine(_configuration.DataDirectoryPath, _csvFileName);
 
         if (!File.Exists(fullFilePath))
-        {
             return false;
-        }
 
-        var lines = File.ReadAllLines(fullFilePath);
-
+        string[] lines = File.ReadAllLines(fullFilePath);
         foreach (var line in lines.Skip(1))
         {
-            var parts = line.Split(',');
-
+            string[] parts = line.Split(',');
             if (parts.Length >= 3 && parts[0].Trim() == ticker)
             {
                 stockData.Add(new StockModel
                 {
                     Ticker = parts[0].Trim(),
                     Date = DateTime.Parse(parts[1].Trim()),
-                    Close = float.Parse(parts[2].Trim())
+                    Close = double.Parse(parts[2].Trim())
                 });
             }
         }
@@ -133,35 +108,24 @@ public class APIDataAccess : IDataAccess
         return stockData.Count > 0;
     }
 
-    public static async Task SaveStockDataToCsvAsync(List<StockModel> stockData)
+    private async Task SaveStockDataToCsvAsync(List<StockModel> stockData)
     {
         if (stockData.Count == 0)
-        {
             return;
-        }
 
-        if (!Directory.Exists(c_DataFolderPath))
-        {
-            Directory.CreateDirectory(c_DataFolderPath);
-        }
+        if (!Directory.Exists(_configuration.DataDirectoryPath))
+            Directory.CreateDirectory(_configuration.DataDirectoryPath);
 
-        string fullFilePath = Path.Combine(c_DataFolderPath, c_CsvFileName);
-
-        var sb = new StringBuilder();
-        sb.AppendLine("Ticker,Date,Close");
+        string fullFilePath = Path.Combine(_configuration.DataDirectoryPath, _csvFileName);
+        StringBuilder csvContent = new();
+        csvContent.AppendLine("Ticker,Date,Close");
 
         foreach (var stock in stockData)
-        {
-            sb.AppendLine($"{stock.Ticker},{stock.Date:yyyy-MM-dd},{stock.Close}");
-        }
+            csvContent.AppendLine($"{stock.Ticker},{stock.Date:yyyy-MM-dd},{stock.Close}");
 
-        await File.WriteAllTextAsync(fullFilePath, sb.ToString());
-        Console.WriteLine($"Stock data saved to {fullFilePath}");
+        await File.WriteAllTextAsync(fullFilePath, csvContent.ToString());
     }
 
-    // helper method to safely parse a float from a jtoken
-    private static float TryParseFloat(string? value)
-    {
-        return value != null && float.TryParse(value, out float result) ? result : 0f;
-    }
+    private static double TryParseDouble(string? value) =>
+        value is not null && double.TryParse(value, out double result) ? result : 0.0;
 }
